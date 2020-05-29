@@ -1,0 +1,4 @@
+# Ignoramos todos los archivos del directorio excepto este
+# El objetivo es que git cree el directorio pero nada mas
+*
+!.gitignore
