@@ -88,58 +88,58 @@ En las reglas de producción se presentan en minúsculas.
 *sosh* ::= *sosh_command* **END**
 
 *sosh_command* ::=\
-    *call* 
-    | *assignation*
+&ensp;*call*\
+&ensp;| *assignation*
 
-*call* ::=
-    *simple_call*
-    | *compound_call*
+*call* ::=\
+&ensp;*simple_call*\
+&ensp;| *compound_call*
 
-*compound_call* ::=
-    *pipeline*
-    | *sequence*
+*compound_call* ::=\
+&ensp;*pipeline*\
+&ensp;| *sequence*
 
-*pipeline* ::=
-    *pipe_start* *pipe_end*
+*pipeline* ::=\
+&ensp;*pipe_start* *pipe_end*
 
-*pipe_start* ::=
-    *single_call* **`|`**
-    *call_from_file* **`|`**
+*pipe_start* ::=\
+&ensp;*single_call* **`|`**\
+&ensp;| *call_from_file* **`|`**
 
-*pipe_end* ::=
-    *single_call*
-    | *call_to_file*
-    | *pipe_end* *single_call* `|`
+*pipe_end* ::=\
+&ensp;*single_call*\
+&ensp;| *call_to_file*\
+&ensp;| *pipe_end* *single_call* `|`
 
-*simple_call* ::=
-    *single_call*
-    | *call_from_file*
-    | *call_from_to_file*
+*simple_call* ::=\
+&ensp;*single_call*\
+&ensp;| *call_from_file*\
+&ensp;| *call_from_to_file*
 
-*call_from_to_file* ::=
-    *call_to_file*
-    | *call_from_file* **`>`** *string*
+*call_from_to_file* ::=\
+&ensp;*call_to_file*\
+&ensp;| *call_from_file* **`>`** *string*
 
-*call_to_file* ::=
-    *single_call* **`>`** *string*
+*call_to_file* ::=\
+&ensp;*single_call* **`>`** *string*
 
-*call_from_file* ::=
-    **`<`** *string* *single_call
+*call_from_file* ::=\
+&ensp;**`<`** *string* *single_call
 
-*single_call* ::=
-    *string*
-    | *string* *params*
+*single_call* ::=\
+&ensp;*string*
+&ensp;| *string* *params*\
 
-*params* ::=
-    *string*
-    | *params* *string*
+*params* ::=\
+&ensp;*string*
+&ensp;| *params* *string*
 
-*string* ::=
-    **SIMPLE_STRING**
-    | **BEGIN_DELIM_STRING** **END_DELIM_STRING**
-    | *eval_var*
+*string* ::=\
+&ensp;**SIMPLE_STRING**\
+&ensp;| **BEGIN_DELIM_STRING** **END_DELIM_STRING**\
+&ensp;| *eval_var*
 
 // No se usa por ahora
-*eval_var* ::=
-    **`$`** **SIMPLE_STRING**
-    | **`$`** **BEGIN_DELIM_STRING** **END_DELIM_STRING**
+*eval_var* ::=\
+&ensp;**`$`** **SIMPLE_STRING**\
+&ensp;| **`$`** **BEGIN_DELIM_STRING** **END_DELIM_STRING**
