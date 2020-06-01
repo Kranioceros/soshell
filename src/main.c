@@ -13,7 +13,6 @@ int main(int argc, char *argv[]) {
     // Si no es una linea vacia
     history_add(line);
     read_from(line);
-    size_t line_len = strlen(line);
     ASTNode *root = parse();
     if (root) {
       root = remove_G(root);
