@@ -1,4 +1,5 @@
 #include "AST.h"
+#include "checker.h"
 #include "history.h"
 #include "parser.h"
 #include <readline/history.h>
@@ -16,6 +17,11 @@ int main(int argc, char *argv[]) {
     ASTNode *root = parse();
     if (root) {
       root = remove_G(root);
+      print_node(root, 0);
+      Error err;
+      if (check_redirections(root, &err) < 0) {
+        printf("Error while checking redirections\n");
+      }
       print_node(root, 0);
       free_node(root);
     }
