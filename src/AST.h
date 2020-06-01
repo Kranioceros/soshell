@@ -29,7 +29,8 @@ typedef struct SimpleCall {
 } SimpleCall;
 
 typedef struct CompoundCall {
-  char op;
+  char op;               // `|` si une sus comandos con tuberias
+                         // `G` si solo agrupa sus comandos
   Commands *comms;       // Los comandos estan listados en orden inverso!
                          // No deberia ser NULL
   const char *stdout_to; // NULL si la salida es stdout
@@ -67,6 +68,11 @@ void add_param(Params *params, const char *s);
 Commands *new_comm(ASTNode *node);
 // Agrega comando `node` a bloque de parametros `comms`
 void add_comm(Commands *comms, ASTNode *node);
+
+/**** NORMALIZADO DEL AST ****/
+// Borra ccalls con operador `G`, producto de agrupar innecesariamente usando []
+// Devuelve puntero a nuevo arbol
+ASTNode *remove_G(ASTNode *node);
 
 /**** BORRADO DEL AST ****/
 
