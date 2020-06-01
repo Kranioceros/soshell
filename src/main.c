@@ -16,9 +16,8 @@ int main(int argc, char *argv[]) {
     size_t line_len = strlen(line);
     ASTNode *root = parse();
     if (root) {
-      printf("==============\n");
+      root = remove_G(root);
       print_node(root, 0);
-      printf("==============\n");
       free_node(root);
     }
   }
