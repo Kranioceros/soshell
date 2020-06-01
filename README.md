@@ -68,7 +68,8 @@ Sosh requiere las siguientes herramientas para ser compilado:
 * gcc
 * flex
 * bison
+* libreadline-dev (Headers de desarrollo de libreadline7)
 
 ---
 ## Dependencias
-Requiere la biblioteca dinámica de flex, pero esta debería estar en prácticamente cualquier distribución Linux.
+Requiere las biblioteca dinámicas de flex y de readline7, pero estas deberían estar en prácticamente cualquier distribución Linux.
