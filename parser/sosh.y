@@ -25,9 +25,9 @@
 
 %type <s> string
 %type <p> params
-%type <c> pipe_list
 %type <n> single_call call_from_file call_to_file call_from_to_file
-%type <n> call compound_call simple_call ungrouped_simple_call
+%type <n> simple_call ungrouped_simple_call
+%type <n> call compound_call pipe
 
 %%
 
@@ -40,32 +40,62 @@ test:
 call:
     simple_call
     | compound_call
-
-compound_call:
-    pipe_list simple_call { if ($2->value.scall.stdin_to != NULL)  {
-                                yyerror("last call inside pipeline contains stdin redirection");
-                                YYERROR;
-                            }
-                            add_comm($1, $2);
-                            $$ = new_ccall('|', $1); }
     ;
 
-pipe_list:
-    simple_call '|'                   { if ($1->value.scall.stdout_to != NULL) {
-                                            yyerror("first call inside pipeline contains stdout redirection");
-                                            YYERROR;
+compound_call:
+    pipe                            {
+                                        $$ = $1;
+                                        ;
+                                    }
+    | '[' compound_call ']'         {
+                                        Commands *c = new_comm($2);
+                                        $$ = new_ccall('G', c);
+                                    }
+    ;
+
+pipe:
+    simple_call '|' simple_call     {
+                                        Commands *c = new_comm($1);
+                                        add_comm(c, $3);
+                                        $$ = new_ccall('|', c);
+                                        ;
+                                    }
+    | compound_call '|' simple_call {
+                                        CompoundCall *ccall = &$1->value.ccall;
+                                        switch(ccall->op) {
+                                            case 'G':
+                                            ccall->op = '|';
+                                            add_comm(ccall->comms, $3);
+                                            break;
+
+                                            case '|':
+                                            add_comm(ccall->comms, $3);
+                                            break;
+
+                                            default:
+                                            yyerror("WTF\n");
                                         }
-                                        $$ = new_comm($1); }
-    | pipe_list simple_call '|'       { if ($2->value.scall.stdout_to != NULL || $2->value.scall.stdin_to != NULL) {
-                                            yyerror("call inside pipeline contains redirection of stdin/stdout");
-                                            YYERROR;
-                                        }
-                                        add_comm($1, $2);
-                                        $$ = $1; }
+                                    }
+    | compound_call '|' '[' compound_call ']'   {
+                                                    CompoundCall *ccall = &$1->value.ccall;
+                                                    switch(ccall->op) {
+                                                        case 'G':
+                                                        ccall->op = '|';
+                                                        add_comm(ccall->comms, $4);
+                                                        break;
+
+                                                        case '|':
+                                                        add_comm(ccall->comms, $4);
+                                                        break;
+
+                                                        default:
+                                                        yyerror("WTF\n");
+                                                    }
+                                                }
     ;
 
 simple_call:
-    '[' simple_call ']'  { $$ = $2; }
+    '[' simple_call ']'             { $$ = $2; }
     | ungrouped_simple_call
     ;
 
@@ -77,27 +107,24 @@ ungrouped_simple_call:
     ;
 
 call_from_to_file:
-    '<' string single_call '>' string { printf("call_from_to_file\n");
-                                        stdout_to_file($3, $2);
+    '<' string single_call '>' string { stdout_to_file($3, $2);
                                         stdin_to_file($3, $5);
                                         $$ = $3; }
     ;
 
 call_to_file:
-    single_call '>' string { printf("call_to_file\n");
-                             stdout_to_file($1, $3);
+    single_call '>' string { stdout_to_file($1, $3);
                              $$ = $1; }
     ;
 
 call_from_file:
-    '<' string single_call { printf("call_from_file\n");
-                             stdin_to_file($3, $2);
+    '<' string single_call { stdin_to_file($3, $2);
                              $$ = $3; }
     ;
 
 single_call:
-    string          { printf("single_call\n"); $$ = new_scall($1, NULL); }
-    | string params { printf("single_call\n"); $$ = new_scall($1, $2); }
+    string          { $$ = new_scall($1, NULL); }
+    | string params { $$ = new_scall($1, $2); }
     ;
 
 params:
@@ -122,5 +149,5 @@ ASTNode* parse() {
 }
 
 int yyerror(const char *s) {
-    fprintf(stderr, "error: %s\n", s);
+    fprintf(stderr, "parse error: %s\n", s);
 }
