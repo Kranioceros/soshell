@@ -86,6 +86,8 @@ int check_redirections_pipe(ASTNode *node, Error *err) {
 
   node->value.ccall.stdin_to = get_stdin_to(first_child);
   node->value.ccall.stdout_to = get_stdout_to(last_child);
+
+  return 0;
 }
 
 int check_redirections(ASTNode *node, Error *err) {
