@@ -93,6 +93,22 @@ void add_comm(Commands *comms, ASTNode *node) {
 
   comms->c[comms->count++] = node;
 }
+
+void add_comm_begin(Commands *comms, ASTNode *node) {
+  assert(comms != NULL);
+  assert(comms->count < PARAMS_MAX);
+  assert(node != NULL);
+  assert(node->type == TySimpleCall || node->type == TyCompoundCall);
+
+  comms->count++;
+  // Desplazamos todos hacia adelante una posicion
+  for (int i = comms->count - 1; i >= 0; --i) {
+    comms->c[i] = comms->c[i - 1];
+  }
+  // Guardamos el nodo en la primera posicion
+  comms->c[0] = node;
+}
+
 /**** BORRADO ****/
 // Funcion auxiliar para borrar string si no es NULL
 void freeif(const char *p) {

@@ -68,6 +68,8 @@ void add_param(Params *params, const char *s);
 Commands *new_comm(ASTNode *node);
 // Agrega comando `node` a bloque de parametros `comms`
 void add_comm(Commands *comms, ASTNode *node);
+// Agrega comando `node` a bloque de parametros `comms` al principio
+void add_comm_begin(Commands *comms, ASTNode *node);
 
 /**** NORMALIZADO DEL AST ****/
 // Borra ccalls con operador `G`, producto de agrupar innecesariamente usando []
