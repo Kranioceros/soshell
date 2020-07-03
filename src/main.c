@@ -12,6 +12,10 @@ int main(int argc, char *argv[]) {
 
   while (line = readline("sosh> ")) {
     // Si no es una linea vacia
+    if (strlen(line) == 0) {
+      continue;
+    }
+
     history_add(line);
     read_from(line);
     ASTNode *root = parse();
