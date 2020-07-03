@@ -29,6 +29,8 @@
 %type <n> simple_call ungrouped_simple_call
 %type <n> call compound_call pipe
 
+%left '|'
+
 %%
 
 test:
@@ -43,55 +45,69 @@ call:
     ;
 
 compound_call:
-    pipe                            {
-                                        $$ = $1;
-                                        ;
-                                    }
-    | '[' compound_call ']'         {
-                                        Commands *c = new_comm($2);
-                                        $$ = new_ccall('G', c);
-                                    }
+    pipe                            { $$ = $1; }
+    | '[' compound_call ']'         { $$ = $2; }
     ;
 
 pipe:
-    simple_call '|' simple_call     {
-                                        Commands *c = new_comm($1);
-                                        add_comm(c, $3);
-                                        $$ = new_ccall('|', c);
-                                        ;
+    simple_call '|' simple_call {
+                                    printf("scall | scall\n");
+                                    Commands *c = new_comm($1);
+                                    add_comm(c, $3);
+                                    $$ = new_ccall('|', c);
+                                }
+    | simple_call '|' compound_call {
+                                    printf("scall | ccall\n");
+                                    CompoundCall *ccall = &$3->value.ccall;
+                                    switch(ccall->op) {
+                                        case 'G':
+                                        ccall->op = '|';
+                                        add_comm_begin(ccall->comms, $1);
+                                        break;
+
+                                        case '|':
+                                        add_comm_begin(ccall->comms, $1);
+                                        break;
+
+                                        default:
+                                        yyerror("WTF\n");
+                                    }
+                                    $$ = $3;
+                                    }
+    | compound_call '|' compound_call {
+                                    printf("ccall | ccall\n");
+                                    CompoundCall *ccall = &$1->value.ccall;
+                                    switch(ccall->op) {
+                                        case 'G':
+                                        ccall->op = '|';
+                                        add_comm(ccall->comms, $3);
+                                        break;
+
+                                        case '|':
+                                        add_comm(ccall->comms, $3);
+                                        break;
+
+                                        default:
+                                        yyerror("WTF\n");
+                                    }
                                     }
     | compound_call '|' simple_call {
-                                        CompoundCall *ccall = &$1->value.ccall;
-                                        switch(ccall->op) {
-                                            case 'G':
-                                            ccall->op = '|';
-                                            add_comm(ccall->comms, $3);
-                                            break;
+                                    printf("ccall | scall\n");
+                                    CompoundCall *ccall = &$1->value.ccall;
+                                    switch(ccall->op) {
+                                        case 'G':
+                                        ccall->op = '|';
+                                        add_comm(ccall->comms, $3);
+                                        break;
 
-                                            case '|':
-                                            add_comm(ccall->comms, $3);
-                                            break;
+                                        case '|':
+                                        add_comm(ccall->comms, $3);
+                                        break;
 
-                                            default:
-                                            yyerror("WTF\n");
-                                        }
+                                        default:
+                                        yyerror("WTF\n");
                                     }
-    | compound_call '|' '[' compound_call ']'   {
-                                                    CompoundCall *ccall = &$1->value.ccall;
-                                                    switch(ccall->op) {
-                                                        case 'G':
-                                                        ccall->op = '|';
-                                                        add_comm(ccall->comms, $4);
-                                                        break;
-
-                                                        case '|':
-                                                        add_comm(ccall->comms, $4);
-                                                        break;
-
-                                                        default:
-                                                        yyerror("WTF\n");
-                                                    }
-                                                }
+                                    }
     ;
 
 simple_call:
