@@ -78,8 +78,8 @@ ungrouped_simple_call:
 
 call_from_to_file:
     '<' string single_call '>' string { printf("call_from_to_file\n");
-                                        stdout_to_file($3, $2);
-                                        stdin_to_file($3, $5);
+                                        stdout_to_file($3, $5);
+                                        stdin_to_file($3, $2);
                                         $$ = $3; }
     ;
 
