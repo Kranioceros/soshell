@@ -2,6 +2,7 @@
 #include "checker.h"
 #include "history.h"
 #include "parser.h"
+#include "spawn.h"
 #include <readline/history.h>
 #include <readline/readline.h>
 #include <stdio.h>
@@ -21,12 +22,30 @@ int main(int argc, char *argv[]) {
     ASTNode *root = parse();
     if (root) {
       root = remove_G(root);
-      print_node(root, 0);
+      // print_node(root, 0);
       Error err;
       if (check_redirections(root, &err) < 0) {
         printf("Error while checking redirections\n");
       }
       print_node(root, 0);
+
+      // Exceptuamos comandos compuestos por ahora
+      if (root->type == TyCompoundCall) {
+        printf("Aun no soportamos comandos compuestos :)\n");
+        free_node(root);
+        continue;
+      }
+
+      // Ejecutamos comando (bloquea el proceso)
+      printf("=======================\n");
+      int status_code;
+      TySpawnError res = run_scall(&root->value.scall, &status_code);
+
+      // Mostramos error si lo hubo
+      if (res != 0) {
+        print_spawn_error(res, root);
+      }
+
       free_node(root);
     }
   }
