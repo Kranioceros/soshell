@@ -359,7 +359,8 @@ pid_t exec_ccall(Commands *comms, int in_fd, int out_fd, SpawnError *err) {
   switch (p) {
   case 0:
     // Llamamos rutina de manejo de operador
-    _exit(run_pipe(comms, err));
+    run_pipe(comms, err);
+    _exit(err->type);
 
   case -1:
     // Restauramos descriptores
