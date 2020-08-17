@@ -30,11 +30,9 @@ int main(int argc, char *argv[]) {
     parse_error = 0;
     root = parse();
     if (!parse_error) {
-      debugf("root different from NULL!\n");
       root = remove_G(root);
       Error err;
       if (check_redirections(root, &err) < 0) {
-        printf("Error while checking redirections\n");
       }
 
       print_node(root, 0);

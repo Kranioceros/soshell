@@ -85,7 +85,7 @@ int run_scall(SimpleCall *call, int *status_code, SpawnError *err) {
   // Si hubo un error al crear proceso o algunos de los archivos de stdin o
   // stdout no existe, se retorna sin esperar al hijo
   if (hijo == 0) {
-    debugf("hijo == 0\n");
+    debugf("run_scall: Error creando proceso\n");
     return -1;
   }
 
@@ -98,20 +98,20 @@ int run_scall(SimpleCall *call, int *status_code, SpawnError *err) {
 
   if (WIFEXITED(*status_code) && !error_exec) {
     // Si el hijo termino normalmente y el exec se ejecuto sin errores
-    debugf("hijo se ejecuto y retorno exitosamente\n");
+    debugf("run_scall: Hijo ejecuto y retorno exitosamente\n");
     return 0;
   } else if (WIFEXITED(*status_code) && error_exec) {
     // Si el hijo termino normalmente pero el exec fallo
     // (Esto asume que el programa a ejecutar no usa los codigos de errores 126
     // y 127. No deberian!)
-    debugf("hijo no se ejecutó exitosamente\n");
+    debugf("run_scall: Hijo no se ejecutó exitosamente\n");
     err->type = decoded;
     err->str = call->program_name;
     return -1;
   } else {
     // Si el hijo no termino normalmente, pero no tiene que ver con el
     // ejecutable (?)
-    debugf("hijo termino abruptamente (?)\n");
+    debugf("run_scall: Hijo termino abruptamente\n");
     err->type = ERR_DESCONOCIDO;
     return -1;
   }
@@ -178,7 +178,7 @@ int run_ccall(CompoundCall *call, int *status_code, SpawnError *err) {
   // Si hubo un error al crear proceso o algunos de los archivos de stdin o
   // stdout no existe, se retorna sin esperar al hijo
   if (hijo == 0) {
-    debugf("hijo == 0\n");
+    debugf("run_ccall: Error creando proceso\n");
     return -1;
   }
 
@@ -191,20 +191,21 @@ int run_ccall(CompoundCall *call, int *status_code, SpawnError *err) {
 
   if (WIFEXITED(*status_code) && !error_exec) {
     // Si el hijo termino normalmente y el exec se ejecuto sin errores
-    debugf("hijo se ejecuto y retorno exitosamente\n");
+    debugf("run_ccall: Pipeline se ejecuto y retorno exitosamente\n");
     return 0;
   } else if (WIFEXITED(*status_code) && error_exec) {
     // Si el hijo termino normalmente pero el exec fallo
     // (Esto asume que el programa a ejecutar no usa los codigos de errores 126
     // y 127. No deberian!)
-    debugf("hijo no se ejecutó exitosamente\n");
+    debugf("run_ccall: Pipeline no se ejecuto correctamente debido a un error "
+           "en los subcomandos\n");
     err->type = decoded;
     err->str = "PIPELINE";
     return -1;
   } else {
     // Si el hijo no termino normalmente, pero no tiene que ver con el
     // ejecutable (?)
-    debugf("hijo termino abruptamente (?)\n");
+    debugf("run_ccall: Pipeline termino abruptamente\n");
     err->type = ERR_DESCONOCIDO;
     return -1;
   }
@@ -320,7 +321,7 @@ pid_t exec_scall(const char *program_name, Params *params, int in_fd,
     dup2(old_stdout, STDOUT_FILENO);
     close(old_stdout);
 
-    debugf("Error al crear proceso hijo\n");
+    debugf("exec_scall: Error al crear proceso hijo\n");
     err->type = ERR_DESCONOCIDO;
 
   default:
@@ -369,7 +370,7 @@ pid_t exec_ccall(Commands *comms, int in_fd, int out_fd, SpawnError *err) {
     dup2(old_stdout, STDOUT_FILENO);
     close(old_stdout);
 
-    debugf("Error al crear proceso hijo\n");
+    debugf("exec_ccall: Error al crear proceso hijo\n");
     err->type = ERR_DESCONOCIDO;
 
   default:
@@ -402,7 +403,7 @@ pid_t run_pipe(Commands *comms, SpawnError *err) {
   for (int i = 0; i < n_pipes; ++i) {
     if (pipe(&pipes[2 * i]) != 0) {
       err->type = ERR_PIPE;
-      debugf("error pipes\n");
+      debugf("run_pipe: Error al crear pipes\n");
       return -1;
     }
   }
@@ -452,13 +453,13 @@ pid_t run_pipe(Commands *comms, SpawnError *err) {
 
       if (WIFEXITED(status_code) && !error_exec) {
         // Si el hijo termino normalmente y el exec se ejecuto sin errores
-        debugf("Hijo termino bien y no hubo error de ejecucion\n");
+        debugf("run_pipe: Hijo termino bien y no hubo error de ejecucion\n");
         continue;
       } else if (WIFEXITED(status_code) && error_exec) {
         // Si el hijo termino normalmente pero el exec fallo
         // (Esto asume que el programa a ejecutar no usa los codigos de errores
         // 126 y 127. No deberian!)
-        debugf("Hubo error de ejecucion\n");
+        debugf("run_pipe: Hijo no se ejecuto correctamente\n");
         err->type = decoded;
         err->str = call->program_name;
         return -1;
@@ -472,7 +473,5 @@ pid_t run_pipe(Commands *comms, SpawnError *err) {
       // Recursion :)
     }
   }
-
-  debugf("Saliendo normalmente\n");
   return 0;
 }
