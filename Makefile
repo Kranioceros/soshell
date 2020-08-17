@@ -52,7 +52,7 @@ parser/sosh.tab.h: parser/sosh.y src/AST.h
 
 # non-phony targets
 $(TARGET): $(OBJ)
-	$(CC) $(CCFLAG) $(LINKFLAG) -o $@ $?
+	$(CC) $(CCFLAG) $? $(LINKFLAG) -o $@ 
 
 $(OBJ_PATH)/%.o: $(SRC_PATH)/%.c*
 	$(CC) $(CCOBJFLAG) -o $@ $<
@@ -61,7 +61,7 @@ $(DBG_PATH)/%.o: $(SRC_PATH)/%.c*
 	$(CC) $(CCOBJFLAG) $(DBGFLAG) -o $@ $<
 
 $(TARGET_DEBUG): $(OBJ_DEBUG)
-	$(CC) $(CCFLAG) $(DBGFLAG) $(LINKFLAG) $? -o $@
+	$(CC) $(CCFLAG) $(DBGFLAG) $? $(LINKFLAG) -o $@ 
 
 # phony rules
 .PHONY: all
