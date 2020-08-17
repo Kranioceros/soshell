@@ -1,9 +1,9 @@
 Gramática
 =========
 
-En este documento definimos la gramática que emplearemos para sosh.
+En este documento definimos la gramática que utilizamos para el lenguaje sosh.
 
-Primero definiremos los símbolos terminales y no terminales y su significado, antes de dar las reglas de producción en la forma BNF.
+Aqui definimos mas que nada el significado de cada simbolo. Las reglas de produccion de los mismos se encuentran en los archivos de flex y sosh listados al final de este documento.
 
 # Símbolos terminales
 En las reglas de producción, se presentan en MAYÚSCULAS.
@@ -15,9 +15,9 @@ En las reglas de producción, se presentan en MAYÚSCULAS.
 * **`}`**:
     * Llave cerrada (`}`), utilizada para terminar un *delim_string*.
 * **`$`**:
-    * Símbolo dólar (`$`), utilizado para evaluación de variables.
+    * Símbolo dólar (`$`), utilizado para evaluación de variables. *(No usado)*
 * **`=`**:
-    * Símbolo igual (`=`), utilizado para definir variables.
+    * Símbolo igual (`=`), utilizado para definir variables. *(No usado)*
 * **`|`**:
     * Símbolo de barra vertical (`|`), utilizado para conectar procesos mediante pipes.
 * **`>`**:
@@ -47,18 +47,17 @@ En las reglas de producción se presentan en minúsculas.
 
 * *sosh*:
     * Símbolo no terminal objetivo (goal). Representa un comando ingresado en la terminal, termina siempre en **EOL**.
-* *sosh_command*:
-    * Representa una llamada o una asignación de variable. Puede ser *call* o *assignation*
-* *assignation*:
-    * Representa la asignación de un valor a una variable. POR DEFINIR.
 * *call*:
     * Representa una llamada simple a un único programa  o una compuesta a varios programas relacionados por operadores. Puede ser *simple_call* o *compound_call*.
 * *compound_call*:
     * Representa una llamada a varios programas relacionados por único operador.
 * *simple_call*:
-    * Representa una llamada a un único programa, con posible redirección de stdin o stdout. Puede ser *single_call*, *call_to_file* o *call_from_to_file*
+    * Representa una llamada a un único programa, con posible redirección de stdin o stdout. Opcionalmente, puede estar
+    rodeada por corchetes (`[]`). Agrupar una unica llamada simple no tiene sentido, pero tampoco tiene que ser un error. Una *simple_call* es una *ungrouped_simple_call*.
+* *ungrouped_simple_call*:
+    * Representa una llamada generica a un unico programa. Puede ser con redireccion de entrada, salida, ambas o ninguna.
 * *single_call*:
-    * Llamada a un único programa, con 0 o más parámetros.
+    * Llamada a un único programa, con 0 o más parámetros. Incluye redireccion de ningun tipo.
 * *call_from_to_file*:
     * Llamada a un único programa, con 0 o más parámetros, con redirección de stdout y stdin a archivos.
 * *call_to_file*:
@@ -68,58 +67,12 @@ En las reglas de producción se presentan en minúsculas.
 * *params*:
     * Representa un conjunto de 1 o más *string*, los parámetros del programa llamado.
 * *string*:
-    * Representa un string cualquiera. Puede tratarse de un **SIMPLE_STRING**, un *delim_string* o de un *eval_var*.
+    * Representa un string cualquiera. Puede tratarse de un **SIMPLE_STRING** o un *delim_string*.
 * *delim_string*:
-    * Representa un string que puede contener espacios o algunos caracteres reservados. Consiste de un **BEGIN_DELIM_STRING** seguido de un **END_DELIM_STRING**.
-* *eval_var*:
-    * Representa la evaluación de una variable. Comienza siempre con **DOLLAR**, pero le puede seguir un **SIMPLE_STRING** o un *delim_string*.
+    * Representa un string que puede contener espacios y/o algunos caracteres reservados. Consiste de un **BEGIN_DELIM_STRING** seguido de un **END_DELIM_STRING**.
 
 # Reglas de producción
-*sosh* ::= *sosh_command* **END**
 
-*sosh_command* ::=\
-&ensp;*call*\
-&ensp;| *assignation*
+Para ver las reglas de produccion de cada simbolo no terminal, leer el archivo de bison `parser/sosh.y`.
 
-*call* ::=\
-&ensp;*simple_call*\
-&ensp;| *compound_call*
-
-*compound_call* ::=\
-&ensp;*pipe_list* *simple_call*\
-
-*pipe_list* ::=\
-&ensp;*simple_call* **`|`**\
-&ensp;| *pipe_list* simple_call **`|`**
-
-*simple_call* ::=\
-&ensp;*single_call*\
-&ensp;| *call_from_file*\
-&ensp;| *call_from_to_file*
-
-*call_from_to_file* ::=\
-&ensp;**`<`** *string* *single_call* **`>`** *string*\
-
-*call_to_file* ::=\
-&ensp;*single_call* **`>`** *string*
-
-*call_from_file* ::=\
-&ensp;**`<`** *string* *single_call
-
-*single_call* ::=\
-&ensp;*string*
-&ensp;| *string* *params*\
-
-*params* ::=\
-&ensp;*string*
-&ensp;| *params* *string*
-
-*string* ::=\
-&ensp;**SIMPLE_STRING**\
-&ensp;| **BEGIN_DELIM_STRING** **END_DELIM_STRING**\
-&ensp;| *eval_var*
-
-// No se usa por ahora
-*eval_var* ::=\
-&ensp;**`$`** **SIMPLE_STRING**\
-&ensp;| **`$`** **BEGIN_DELIM_STRING** **END_DELIM_STRING**
+Para ver las reglas de produccion de cada simbol terminal, leer el archivo de flex `parser/sosh.l`.
