@@ -48,7 +48,7 @@ const char *get_stdout_to(ASTNode *node) {
 }
 
 int check_redirections_pipe(ASTNode *node, Error *err) {
-  printf("check_redirections_pipe called on node: %x\n", node);
+  debugf("check_redirections_pipe called on node: %x\n", node);
   assert(node != NULL);
   assert(node->type == TyCompoundCall);
   assert(node->value.ccall.op == '|');
@@ -65,7 +65,7 @@ int check_redirections_pipe(ASTNode *node, Error *err) {
 
   if (get_stdout_to(first_child) != NULL) {
     err->type = RedirectionError;
-    printf("Failed on first_child stdout_to\n");
+    debugf("Failed on first_child stdout_to\n");
     return -1;
   }
 
@@ -73,14 +73,14 @@ int check_redirections_pipe(ASTNode *node, Error *err) {
     ASTNode *middle_child = comms->c[i];
     if (get_stdin_to(middle_child) || get_stdout_to(middle_child)) {
       err->type = RedirectionError;
-      printf("Failed on child %d stdin_to or stdout_to\n", i);
+      debugf("Failed on child %d stdin_to or stdout_to\n", i);
       return -1;
     }
   }
 
   if (get_stdin_to(last_child) != NULL) {
     err->type = RedirectionError;
-    printf("Failed on last_child stdin_to\n");
+    debugf("Failed on last_child stdin_to\n");
     return -1;
   }
 
@@ -104,7 +104,7 @@ int check_redirections(ASTNode *node, Error *err) {
     status = check_redirections_pipe(node, err);
     return status;
   default:
-    printf("Error: Operador desconocido en checker!\n");
+    debugf("Error: Operador desconocido en checker!\n");
   }
   return 0;
 }

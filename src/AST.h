@@ -4,6 +4,14 @@
 #define PARAMS_MAX 32
 #define COMMANDS_MAX 32
 
+#ifdef DEBUG
+#define debugf(args...) printf(args)
+#else
+#define debugf(args...)                                                        \
+  do {                                                                         \
+  } while (0)
+#endif
+
 /** ESTRUCTURAS DE DATOS **/
 
 typedef enum NodeType { TySimpleCall, TyCompoundCall } NodeType;

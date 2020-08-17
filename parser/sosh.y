@@ -2,7 +2,6 @@
     #include <assert.h>
     #include <stdio.h>
     #include <string.h>
-
 %}
 
 %code requires {
@@ -51,13 +50,13 @@ compound_call:
 
 pipe:
     simple_call '|' simple_call {
-                                    printf("scall | scall\n");
+                                    debugf("scall | scall\n");
                                     Commands *c = new_comm($1);
                                     add_comm(c, $3);
                                     $$ = new_ccall('|', c);
                                 }
     | simple_call '|' compound_call {
-                                    printf("scall | ccall\n");
+                                    debugf("scall | ccall\n");
                                     CompoundCall *ccall = &$3->value.ccall;
                                     switch(ccall->op) {
                                         case 'G':
@@ -75,7 +74,7 @@ pipe:
                                     $$ = $3;
                                     }
     | compound_call '|' compound_call {
-                                    printf("ccall | ccall\n");
+                                    debugf("ccall | ccall\n");
                                     CompoundCall *ccall = &$1->value.ccall;
                                     switch(ccall->op) {
                                         case 'G':
@@ -92,7 +91,7 @@ pipe:
                                     }
                                     }
     | compound_call '|' simple_call {
-                                    printf("ccall | scall\n");
+                                    debugf("ccall | scall\n");
                                     CompoundCall *ccall = &$1->value.ccall;
                                     switch(ccall->op) {
                                         case 'G':

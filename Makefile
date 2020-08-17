@@ -2,7 +2,7 @@
 CC := gcc # FILL: the compiler
 CCFLAG := # FILL: compile flags
 LINKFLAG := -lfl -lreadline
-DBGFLAG := -g
+DBGFLAG := -g -DDEBUG
 CCOBJFLAG := $(CCFLAG) -c
 
 # path macros
@@ -22,7 +22,7 @@ SRC := $(foreach x, $(SRC_PATH), $(wildcard $(addprefix $(x)/*,.c*)))
 OBJ := $(addprefix $(OBJ_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
 OBJ := $(OBJ) $(OBJ_PATH)/lex.yy.o $(OBJ_PATH)/sosh.tab.o
 OBJ_DEBUG := $(addprefix $(DBG_PATH)/, $(addsuffix .o, $(notdir $(basename $(SRC)))))
-OBJ_DEBUG := $(OBJ_DEBUG) $(OBJ_PATH)/lex.yy.o $(OBJ_PATH)/sosh.tab.o
+OBJ_DEBUG := $(OBJ_DEBUG) $(DBG_PATH)/lex.yy.o $(DBG_PATH)/sosh.tab.o
 
 # clean files list
 DISTCLEAN_LIST := $(OBJ) \
@@ -38,8 +38,14 @@ default: all
 $(OBJ_PATH)/lex.yy.o: parser/lex.yy.c
 	gcc -c -o $(OBJ_PATH)/lex.yy.o parser/lex.yy.c 
 
+$(DBG_PATH)/lex.yy.o: parser/lex.yy.c
+	gcc -c $(DBGFLAG) -o $(DBG_PATH)/lex.yy.o parser/lex.yy.c 
+
 $(OBJ_PATH)/sosh.tab.o: parser/sosh.tab.c
 	gcc -c -o $(OBJ_PATH)/sosh.tab.o parser/sosh.tab.c
+
+$(DBG_PATH)/sosh.tab.o: parser/sosh.tab.c
+	gcc -c $(DBGFLAG) -o $(DBG_PATH)/sosh.tab.o parser/sosh.tab.c
 
 parser/lex.yy.c: parser/sosh.l parser/sosh.tab.h
 	flex -o parser/lex.yy.c parser/sosh.l
