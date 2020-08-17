@@ -13,6 +13,11 @@ typedef enum TySpawnError {
   ERR_PIPE,
   ERR_DESCONOCIDO,
   ERR_ANIDADAS,
+  ERR_CDENOENT,
+  ERR_CDEACCES,
+  ERR_CDENAMETOOLONG,
+  ERR_CDTOOMANYPARAMS,
+  ERR_CDNOHOME,
 } TySpawnError;
 
 typedef struct SpawnError {

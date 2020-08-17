@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -23,6 +24,8 @@ pid_t exec_scall(const char *program_name, Params *params, int in_fd,
 pid_t exec_ccall(Commands *comms, int in_fd, int out_fd, SpawnError *err);
 
 pid_t run_pipe(Commands *comms, SpawnError *err);
+// Ejecuta el comando integrado 'cd'
+int sosh_chdir(const char *path, SpawnError *err);
 
 // FUNCIONES PRINCIPALES
 // Ejecuta la llamada call. Cualquier error relacionado a permisos de los
@@ -36,6 +39,28 @@ int run_scall(SimpleCall *call, int *status_code, SpawnError *err) {
   assert(err);
 
   err->type = NO_ERR;
+
+  // Si se trata de una llamada integrada en sosh, la ejecutamos
+  if (strcmp(call->program_name, "cd") == 0) {
+    const char *path;
+    // Si no tiene parametros, se va al directorio base del usuario
+    if (call->params == NULL) {
+      const char *home_dir = getenv("HOME");
+      if (home_dir == NULL) {
+        err->type = ERR_CDNOHOME;
+        return -1;
+      } else {
+        path = home_dir;
+      }
+    } else if (call->params->count > 1) {
+      err->type = ERR_CDTOOMANYPARAMS;
+      return -1;
+    } else {
+      path = call->params->s[0];
+    }
+
+    return sosh_chdir(path, err);
+  }
 
   // Abrimos archivos para redireccionar stdin y stdout
   int new_stdin = -1;
@@ -250,6 +275,22 @@ void print_spawn_error(SpawnError *err) {
     printf("El comando ingresado contiene llamadas compuestas anidadas; sosh "
            "aun no"
            " soporta esta caracteristica\n");
+    break;
+  case ERR_CDENOENT:
+    printf("El directorio '%s' no existe\n", err->str);
+    break;
+  case ERR_CDEACCES:
+    printf("No tiene permisos para acceder a la ubicacion '%s'\n", err->str);
+    break;
+  case ERR_CDENAMETOOLONG:
+    printf("La ruta '%s' excede el limite de caracteres permitido\n", err->str);
+    break;
+  case ERR_CDTOOMANYPARAMS:
+    printf("El comando cd solo toma un parametro\n");
+    break;
+  case ERR_CDNOHOME:
+    printf("No se encuentra definida la variable de ambiente HOME. No se hara "
+           "nada.\n");
     break;
   case ERR_DESCONOCIDO:
     printf("Hubo un error desconocido\n");
@@ -473,5 +514,32 @@ pid_t run_pipe(Commands *comms, SpawnError *err) {
       // Recursion :)
     }
   }
+  return 0;
+}
+
+int sosh_chdir(const char *path, SpawnError *err) {
+  assert(path);
+  assert(err);
+  int status = chdir(path);
+
+  if (status != 0) {
+    switch (errno) {
+    case ENAMETOOLONG:
+      err->type = ERR_CDENAMETOOLONG;
+      err->str = path;
+      return -1;
+
+    case EACCES:
+      err->type = ERR_CDEACCES;
+      err->str = path;
+      return -1;
+
+    case ENOENT:
+      err->type = ERR_CDENOENT;
+      err->str = path;
+      return -1;
+    }
+  }
+
   return 0;
 }
