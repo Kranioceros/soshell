@@ -27,23 +27,21 @@ int main(int argc, char *argv[]) {
       if (check_redirections(root, &err) < 0) {
         printf("Error while checking redirections\n");
       }
-      print_node(root, 0);
+      // print_node(root, 0);
 
-      // Exceptuamos comandos compuestos por ahora
+      int status_code;
+      SpawnError err_sp;
+      int spawn_error;
+
       if (root->type == TyCompoundCall) {
-        printf("Aun no soportamos comandos compuestos :)\n");
-        free_node(root);
-        continue;
+        spawn_error = run_ccall(&root->value.ccall, &status_code, &err_sp);
+      } else {
+        spawn_error = run_scall(&root->value.scall, &status_code, &err_sp);
       }
 
-      // Ejecutamos comando (bloquea el proceso)
-      printf("=======================\n");
-      int status_code;
-      TySpawnError res = run_scall(&root->value.scall, &status_code);
-
-      // Mostramos error si lo hubo
-      if (res != 0) {
-        print_spawn_error(res, root);
+      // Mostramos error de spawn si lo hubo
+      if (spawn_error != 0) {
+        print_spawn_error(&err_sp);
       }
 
       free_node(root);

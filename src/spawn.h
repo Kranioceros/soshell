@@ -3,16 +3,24 @@
 #include "AST.h"
 
 typedef enum TySpawnError {
-  ERR_ACCESO_EXEC = 1,
-  ERR_NOEXISTE_EXEC,
-  ERR_ACCESO_IN,
+  NO_ERR,
+  ERR_ACCESO_EXEC = 126,
+  ERR_NOEXISTE_EXEC = 127,
+  ERR_ACCESO_IN = 3,
   ERR_NOEXISTE_IN,
   ERR_ACCESO_OUT,
   ERR_NOEXISTE_OUT,
+  ERR_PIPE,
   ERR_DESCONOCIDO,
 } TySpawnError;
 
-TySpawnError run_scall(SimpleCall *call, int *status_code);
-void print_spawn_error(TySpawnError type, ASTNode *node);
+typedef struct SpawnError {
+  TySpawnError type;
+  const char *str;
+} SpawnError;
+
+int run_scall(SimpleCall *call, int *status_code, SpawnError *err);
+int run_ccall(CompoundCall *call, int *status_code, SpawnError *err);
+void print_spawn_error(SpawnError *err);
 
 #endif
