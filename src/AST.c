@@ -7,7 +7,6 @@
 /**** CONSTRUCCION ****/
 
 ASTNode *new_ccall(const char op, Commands *comms) {
-  // printf("new_ccall called\n");
   assert(comms != NULL);
 
   ASTNode *node = malloc(sizeof(ASTNode));
@@ -21,7 +20,6 @@ ASTNode *new_ccall(const char op, Commands *comms) {
 }
 
 ASTNode *new_scall(const char *program_name, Params *params) {
-  // printf("new_scall called\n");
   ASTNode *node = malloc(sizeof(ASTNode));
   node->type = TySimpleCall;
   node->value.scall.program_name = program_name;
@@ -39,7 +37,6 @@ ASTNode *new_scall(const char *program_name, Params *params) {
 }
 
 void stdout_to_file(ASTNode *node, const char *s) {
-  // printf("stdout_to_file called\n");
   assert(node != NULL);
   assert(node->type == TySimpleCall);
 
@@ -47,7 +44,6 @@ void stdout_to_file(ASTNode *node, const char *s) {
 }
 
 void stdin_to_file(ASTNode *node, const char *s) {
-  // printf("stdin_to_file called\n");
   assert(node != NULL);
   assert(node->type == TySimpleCall);
 
@@ -55,7 +51,6 @@ void stdin_to_file(ASTNode *node, const char *s) {
 }
 
 Params *new_param(const char *s) {
-  // printf("new_param called\n");
   assert(s != NULL);
   Params *p = malloc(sizeof(Params));
   p->count = 1;
@@ -65,7 +60,6 @@ Params *new_param(const char *s) {
 }
 
 void add_param(Params *params, const char *s) {
-  // printf("add_param called\n");
   assert(params != NULL);
   assert(params->count < PARAMS_MAX);
 
@@ -73,7 +67,6 @@ void add_param(Params *params, const char *s) {
 }
 
 Commands *new_comm(ASTNode *node) {
-  // printf("new_comm called\n");
   assert(node != NULL);
   assert(node->type == TySimpleCall || node->type == TyCompoundCall);
 
@@ -85,7 +78,6 @@ Commands *new_comm(ASTNode *node) {
 }
 
 void add_comm(Commands *comms, ASTNode *node) {
-  // printf("add_comm called\n");
   assert(comms != NULL);
   assert(comms->count < PARAMS_MAX);
   assert(node != NULL);
@@ -225,10 +217,8 @@ void print_params(Params *params, int ind) {
 /**** NORMALIZADO ****/
 ASTNode *remove_G(ASTNode *node) {
   assert(node != NULL);
-  // printf("remove_G called\n");
 
   if (node->type != TyCompoundCall) {
-    // printf("Node is not TyCompoundCall\n");
     return node;
   }
 
@@ -236,7 +226,6 @@ ASTNode *remove_G(ASTNode *node) {
   assert(comms);
 
   if (node->value.ccall.op == 'G') {
-    // printf("Node is G\n");
     assert(comms->count == 1);
     // Copiamos direccion de nodo hijo
     ASTNode *child = comms->c[0];
@@ -249,7 +238,6 @@ ASTNode *remove_G(ASTNode *node) {
 
     return remove_G(child);
   } else {
-    // printf("Node is NOT G\n");
     for (int i = 0; i < comms->count; ++i) {
       comms->c[i] = remove_G(comms->c[i]);
     }
