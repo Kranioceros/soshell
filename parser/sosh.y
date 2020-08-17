@@ -32,7 +32,7 @@
 
 %%
 
-test:
+sosh:
     call EOL { 
                 root = $1;
              }
@@ -164,5 +164,5 @@ ASTNode* parse() {
 }
 
 int yyerror(const char *s) {
-    fprintf(stderr, "parse error: %s\n", s);
+    fprintf(stderr, "Error de sintaxis\n", s);
 }
