@@ -32,12 +32,12 @@ int main(int argc, char *argv[]) {
     if (!parse_error) {
       debugf("root different from NULL!\n");
       root = remove_G(root);
-      // print_node(root, 0);
       Error err;
       if (check_redirections(root, &err) < 0) {
         printf("Error while checking redirections\n");
       }
-      // print_node(root, 0);
+
+      print_node(root, 0);
 
       int status_code;
       SpawnError err_sp;

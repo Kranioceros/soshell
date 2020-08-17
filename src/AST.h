@@ -6,8 +6,12 @@
 
 #ifdef DEBUG
 #define debugf(args...) printf(args)
+#define print_node(x, y) _print_node(x, y)
 #else
 #define debugf(args...)                                                        \
+  do {                                                                         \
+  } while (0)
+#define print_node(x, y)                                                       \
   do {                                                                         \
   } while (0)
 #endif
@@ -92,7 +96,7 @@ void free_commands(Commands *comms);
 
 /**** FUNCIONES PARA DEBUGGING ****/
 
-void print_node(ASTNode *node, int ind);
+void _print_node(ASTNode *node, int ind);
 void print_scall(ASTNode *node, int ind);
 void print_ccall(ASTNode *node, int ind);
 void print_params(Params *params, int ind);

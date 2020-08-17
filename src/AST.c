@@ -156,7 +156,7 @@ void free_commands(Commands *comms) {
 
 /**** DEBUGGING ****/
 
-void print_node(ASTNode *node, int ind) {
+void _print_node(ASTNode *node, int ind) {
   assert(node != NULL);
   switch (node->type) {
   case TySimpleCall:
@@ -204,7 +204,7 @@ void print_comms(Commands *comms, int ind) {
     printf("%*s%s\n", ind + 2, "", "~None~\n");
   } else {
     for (int i = 0; i < comms->count; ++i) {
-      print_node(comms->c[i], ind + 2);
+      _print_node(comms->c[i], ind + 2);
     }
   }
   printf("%*s}\n", ind, "");
