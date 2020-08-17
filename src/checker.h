@@ -5,13 +5,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef enum TyError { RedirectionError } TyError;
+typedef enum TyRedirError {
+  NO_REDIRERR,
+  ERR_STDIN,
+  ERR_STDOUT,
+} TyRedirError;
 
-typedef struct Error {
-  TyError type;
-  int pos;
-  int len;
-} Error;
+typedef struct RedirError {
+  TyRedirError type;
+  const char *program;
+} RedirError;
 
 const char *get_stdin_to(ASTNode *node) {
   assert(node != NULL);
@@ -29,7 +32,7 @@ const char *get_stdin_to(ASTNode *node) {
   }
 }
 
-int check_redirections(ASTNode *node, Error *err);
+int check_redirections(ASTNode *node, RedirError *err);
 
 const char *get_stdout_to(ASTNode *node) {
   assert(node != NULL);
@@ -47,7 +50,7 @@ const char *get_stdout_to(ASTNode *node) {
   }
 }
 
-int check_redirections_pipe(ASTNode *node, Error *err) {
+int check_redirections_pipe(ASTNode *node, RedirError *err) {
   debugf("check_redirections_pipe called on node: %x\n", node);
   assert(node != NULL);
   assert(node->type == TyCompoundCall);
@@ -64,23 +67,35 @@ int check_redirections_pipe(ASTNode *node, Error *err) {
   ASTNode *last_child = comms->c[comms->count - 1];
 
   if (get_stdout_to(first_child) != NULL) {
-    err->type = RedirectionError;
-    debugf("Failed on first_child stdout_to\n");
+    // Asumimos que nodo es simple_call
+    err->type = ERR_STDOUT;
+    err->program = first_child->value.scall.program_name;
+    debugf("check_redirections_pipe: Redireccionando salida estandar en primer "
+           "comando de pipeline\n");
     return -1;
   }
 
   for (int i = 1; i < comms->count - 1; ++i) {
     ASTNode *middle_child = comms->c[i];
-    if (get_stdin_to(middle_child) || get_stdout_to(middle_child)) {
-      err->type = RedirectionError;
-      debugf("Failed on child %d stdin_to or stdout_to\n", i);
+    int err_stdin = get_stdin_to(middle_child) != NULL;
+    int err_stdout = get_stdout_to(middle_child) != NULL;
+    if (err_stdin || err_stdout) {
+      // Asumimos que nodo es simple_call
+      err->type = err_stdin ? ERR_STDIN : ERR_STDOUT;
+      err->program = middle_child->value.scall.program_name;
+      debugf("check_redirections_pipe: Redireccionando entrada o salida "
+             "estandar de un comando en medio de la pipeline\n",
+             i);
       return -1;
     }
   }
 
   if (get_stdin_to(last_child) != NULL) {
-    err->type = RedirectionError;
-    debugf("Failed on last_child stdin_to\n");
+    // Asumimos que nodo es simple_call
+    err->type = ERR_STDIN;
+    err->program = last_child->value.scall.program_name;
+    debugf("check_redirections_pipe: Redireccionando entrada estandar en "
+           "ultimo comando de pipeline\n");
     return -1;
   }
 
@@ -90,7 +105,7 @@ int check_redirections_pipe(ASTNode *node, Error *err) {
   return 0;
 }
 
-int check_redirections(ASTNode *node, Error *err) {
+int check_redirections(ASTNode *node, RedirError *err) {
   assert(node != NULL);
   if (node->type != TyCompoundCall) {
     return 0;
@@ -107,6 +122,29 @@ int check_redirections(ASTNode *node, Error *err) {
     debugf("Error: Operador desconocido en checker!\n");
   }
   return 0;
+}
+
+void print_redirerror(RedirError *err) {
+  assert(err);
+  switch (err->type) {
+  case ERR_STDIN:
+    printf(
+        "Error de redirección en subcomando '%s': No se puede redireccionar la "
+        "entrada estandar de un subcomando de una pipeline salvo que sea el "
+        "primero\n",
+        err->program);
+    break;
+
+  case ERR_STDOUT:
+    printf(
+        "Error de redirección en subcomando '%s': No se puede redireccionar la "
+        "salida estandar de un subcomando de una pipeline salvo que sea el "
+        "ultimo\n",
+        err->program);
+    break;
+  default:
+    printf("Error desconocido de redireccion\n");
+  }
 }
 
 #endif

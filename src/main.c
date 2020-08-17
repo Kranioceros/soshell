@@ -31,8 +31,14 @@ int main(int argc, char *argv[]) {
     root = parse();
     if (!parse_error) {
       root = remove_G(root);
-      Error err;
-      if (check_redirections(root, &err) < 0) {
+      // Verificamos que no haya errores de redireccion de la salida/entrada
+      // estandar
+      RedirError err_re;
+      err_re.type = NO_REDIRERR;
+      if (check_redirections(root, &err_re) != NO_ERR) {
+        print_redirerror(&err_re);
+        free_node(root);
+        continue;
       }
 
       print_node(root, 0);
