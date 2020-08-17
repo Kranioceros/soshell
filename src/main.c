@@ -8,6 +8,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Contiene booleano seteado por yyerror; establece
+// si hubo un error en el parsing y si es seguro
+// liberar la memoria del arbol o no
+int parse_error = 0;
+// Contiene puntero al nodo raiz del arbol parseado
+ASTNode *root = NULL;
+
 int main(int argc, char *argv[]) {
   char *line = NULL;
 
@@ -19,8 +26,11 @@ int main(int argc, char *argv[]) {
 
     history_add(line);
     read_from(line);
-    ASTNode *root = parse();
-    if (root) {
+    root = NULL;
+    parse_error = 0;
+    root = parse();
+    if (!parse_error) {
+      debugf("root different from NULL!\n");
       root = remove_G(root);
       // print_node(root, 0);
       Error err;

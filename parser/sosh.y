@@ -8,7 +8,8 @@
     #include "../src/AST.h"
     #include "../src/parser.h"
 
-    static ASTNode* root = NULL;
+    extern ASTNode* root;
+    extern int parse_error;
 }
 
 %union {
@@ -165,4 +166,5 @@ ASTNode* parse() {
 
 int yyerror(const char *s) {
     fprintf(stderr, "Error de sintaxis\n", s);
+    parse_error = 1;
 }
