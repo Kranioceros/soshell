@@ -41,6 +41,7 @@ int main(int argc, char *argv[]) {
 
       int status_code;
       SpawnError err_sp;
+      err_sp.type = NO_ERR;
       int spawn_error;
 
       if (root->type == TyCompoundCall) {
