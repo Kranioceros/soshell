@@ -121,6 +121,19 @@ int run_ccall(CompoundCall *call, int *status_code, SpawnError *err) {
   assert(call);
   assert(call->comms);
 
+  // Nos aseguramos de que no se usen llamadas compuestas anidadas
+  // (sin implementar aun)
+  for (int i = 0; i < call->comms->count; ++i) {
+    if (call->comms->c[i]->type == TyCompoundCall) {
+      printf("compound\n");
+      err->type = ERR_ANIDADAS;
+      err->str = NULL;
+      return -1;
+    } else {
+      printf("simple\n");
+    }
+  }
+
   // Abrimos archivos para redireccionar stdin y stdout
   int new_stdin = -1;
   int new_stdout = -1;
@@ -234,6 +247,11 @@ void print_spawn_error(SpawnError *err) {
   case ERR_PIPE:
     printf("Hubo un error creando pipes (probablemente se excedio el limite "
            "maximo de descriptores de archivo por proceso)\n");
+    break;
+  case ERR_ANIDADAS:
+    printf("El comando ingresado contiene llamadas compuestas anidadas; sosh "
+           "aun no"
+           " soporta esta caracteristica\n");
     break;
   case ERR_DESCONOCIDO:
     printf("Hubo un error desconocido\n");
