@@ -3,7 +3,6 @@ Proyecto de shell simple para Sistemas Operativos
 
 Disponible en [github.com/Kranioceros/soshell](https://github.com/Kranioceros/soshell).
 
----
 ## Uso
 A continuación se dan instrucciones básicas de uso para sosh.
 
@@ -77,7 +76,7 @@ Ejemplos de tuberías mal formadas (las partes problemáticas marcadas con aster
 * `grep patron {archivo 1.txt} **>f1** | wc -l`
 * `grep patron {archivo 1.txt} | **<f1** wc -l`
 
----
+
 ## Compilación
 Sosh requiere las siguientes herramientas para ser compilado:
 
@@ -96,11 +95,11 @@ y el AST construido, ejecute `make debug`. El ejecutable debug debería estar en
 
 Ante cualquier problema de compilación, ejecute un `make clean` para borrar todos los archivos objeto e intermedios creados hasta el momento.
 
----
+
 ## Dependencias
 Requiere las bibliotecas dinámicas de flex y de readline (que proveen las banderas de linkeo `-lfl` y `-lreadline`), pero estas deberían estar en prácticamente cualquier distribución Linux.
 
----
+
 ## Limitaciones
 
 * Actualmente el scanner utilizado por sosh es muy primitivo y **no contiene soporte para secuencias de escape**. Esto significa que, debido al uso de las llaves (`{}`) como caracteres delimitadores en strings delimitados, **es imposible actualmente usar las llaves dentro de un string**.
