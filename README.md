@@ -1,6 +1,8 @@
 # sosh
 Proyecto de shell simple para Sistemas Operativos
 
+Disponible en [github.com/Kranioceros/soshell](https://github.com/Kranioceros/soshell).
+
 ---
 ## Uso
 A continuación se dan instrucciones básicas de uso para sosh.
