@@ -87,7 +87,7 @@ Sosh requiere las siguientes herramientas para ser compilado:
 * bison
 * libreadline-dev (Headers de desarrollo de libreadline)
 
-Para compilar, solo inicie una terminal en un carpeta dentro del proyecto y ejecute `make`. El ejecutable final se debería encontrar en la carpeta `bin`.
+Para compilar, solo inicie una terminal dentro de la carpeta del proyecto y ejecute `make`. El ejecutable final se debería encontrar en la carpeta `bin`.
 
 Para una versión de debug con mensajes de las funciones llamadas e información sobre el parser
 y el AST construido, ejecute `make debug`. El ejecutable debug debería estar en la carpeta `debug`.
