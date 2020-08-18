@@ -50,7 +50,7 @@ Por lo tanto, el siguiente comando contiene un error:
 
 El usuario probablemente quiso pasar dos parámetros separados a grep: `1[0-9]*` y `/etc/passwd`. Pero debido a que utilizó un único string delimitado, `grep` solo recibirirá un parámetro con el contenido del string completo.
 
- ### Redirección de entrada/salida estándar
+### Redirección de entrada/salida estándar
 
 Además, es posible redireccionar la entrada o la salida estándar del programa invocado.
 * Para redireccionar la entrada estándar, se **antepone** a la llamada el operador `<` seguido de un archivo.
