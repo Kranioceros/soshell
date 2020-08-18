@@ -117,6 +117,6 @@ Esto complica la comunicación de errores de las llamada contenidas en las tuber
 \
 Debido a esta decisión de diseño, resulta imposible comunicar los errores completos al proceso principal sin usar algún método de comunicación entre procesos. Esto no se hizo por cuestiones de tiempo, así que el proceso principal puede indicar que hubo un error en la tubería **pero no indicar exactamente cual y en qué llamada de la misma**.
 
-[^1]: Existe una interpretación válida para el caso de la redirección de salida estándar en cualquier llamada dentro de una tubería (salvo la última). Podría *dividirse* la salida de la llamada redireccionada, yendo su contenido tanto a la siguiente llamada como a un archivo.
+[1]: Existe una interpretación válida para el caso de la redirección de salida estándar en cualquier llamada dentro de una tubería (salvo la última). Podría *dividirse* la salida de la llamada redireccionada, yendo su contenido tanto a la siguiente llamada como a un archivo.
 
 Pero esta interpretación sería bastante más compleja de implementar, su uso no sería habitual y probablemente termine permitiendo errores inadvertidos por parte del usuario.
